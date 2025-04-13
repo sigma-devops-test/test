@@ -27,4 +27,4 @@ jobs:
         with:
           skip_existing: true
           packages_with_index: true
-          charts_dir: /kubernetes/helm/charts
+          charts_dir: "kubernetes/helm/charts"
