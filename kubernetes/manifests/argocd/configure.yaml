@@ -69,7 +69,7 @@ spec:
   sources:
   - repoURL: https://sigma-devops-test.github.io/test
     chart: wordpress
-    targetRevision: 0.2.0
+    targetRevision: 0.2.1
   destination:
     server: https://kubernetes.default.svc
     namespace: default
