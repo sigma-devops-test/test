@@ -1,0 +1,75 @@
+apiVersion: v1
+data:
+  name: c2lnbWEtZGV2b3BzLXRlc3Q=
+  project: ZGVmYXVsdA==
+  type: Z2l0
+  url: aHR0cHM6Ly9naXRodWIuY29tL3NpZ21hLWRldm9wcy10ZXN0L3Rlc3Q=
+kind: Secret
+metadata:
+  annotations:
+    managed-by: argocd.argoproj.io
+  labels:
+    argocd.argoproj.io/secret-type: repository
+  name: repo-sigma-devops-test
+  namespace: argocd
+type: Opaque
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: rbac
+  namespace: argocd
+spec:
+  destination:
+    namespace: default
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: kubernetes/manifests/rbac
+    repoURL: https://github.com/sigma-devops-test/test
+    targetRevision: HEAD
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ingress-nginx-controller
+  namespace: argocd
+spec:
+  destination:
+    namespace: default
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: kubernetes/manifests/nginx
+    repoURL: https://github.com/sigma-devops-test/test
+    targetRevision: HEAD
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: secrets-store-csi-driver
+  namespace: argocd
+spec:
+  destination:
+    namespace: default
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: kubernetes/manifests/secrets-store-csi-driver
+    repoURL: https://github.com/sigma-devops-test/test
+    targetRevision: HEAD
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: wordpress
+  namespace: argocd
+spec:
+  project: default
+  sources:
+  - repoURL: https://sigma-devops-test.github.io/test
+    chart: wordpress
+    targetRevision: 0.2.0
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
