@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: wordpress
+  annotations:
+    azure.workload.identity/client-id: "4767ab17-1a2f-4afe-9100-2ab04e1d87ec"
+---
+apiVersion: secrets-store.csi.x-k8s.io/v1
+kind: SecretProviderClass
+metadata:
+  name: sigma-devops-test
+spec:
+  provider: azure
+  parameters:
+    usePodIdentity: "false"
+    clientID: "4767ab17-1a2f-4afe-9100-2ab04e1d87ec"
+    keyvaultName: sigma-devops-test
+    objects: |
+      array:
+        - |
+          objectName: mysql-pass
+          objectType: secret
+    tenantId: "8ea185dc-35eb-4b2f-8636-c92c220327de"
+  secretObjects:
+  - data:
+    - key: password
+      objectName: mysql-pass
+    secretName: mysql-pass
+    type: Opaque
+---
+kind: Pod
+apiVersion: v1
+metadata:
+  name: bb
+  labels:
+    azure.workload.identity/use: "true"
+spec:
+  nodeSelector:
+     kubernetes.azure.com/agentpool: wordpress
+  tolerations:
+  - key: "kubernetes.azure.com/scalesetpriority"
+    operator: "Equal"
+    value: "spot"
+    effect: "NoSchedule"
+  serviceAccountName: "wordpress"
+  containers:
+    - name: busybox
+      image: registry.k8s.io/e2e-test-images/busybox:1.29-4
+      command:
+        - "/bin/sleep"
+        - "10000"
+      volumeMounts:
+      - name: secrets-store01-inline
+        mountPath: "/mnt/secrets-store"
+        readOnly: true
+  volumes:
+    - name: secrets-store01-inline
+      csi:
+        driver: secrets-store.csi.k8s.io
+        readOnly: true
+        volumeAttributes:
+          secretProviderClass: "sigma-devops-test"

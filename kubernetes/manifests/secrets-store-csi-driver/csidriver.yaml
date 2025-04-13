@@ -1,0 +1,12 @@
+apiVersion: storage.k8s.io/v1
+kind: CSIDriver
+metadata:
+  name: secrets-store.csi.k8s.io
+spec:
+  podInfoOnMount: true
+  attachRequired: false
+  volumeLifecycleModes:
+  - Ephemeral
+  # https://github.com/Azure/secrets-store-csi-driver-provider-azure/issues/1022#issuecomment-1314214495
+  tokenRequests:
+  - audience: api://AzureADTokenExchange
