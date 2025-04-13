@@ -1,12 +1,12 @@
 terraform {
   required_version = "~> 1.11"
 
-  #backend "azurerm" {
-  #  resource_group_name  = "sigma"
-  #  storage_account_name = "tfstate-sigma-devops-test"
-  #  container_name       = "tfstate"
-  #  key                  = "terraform.tfstate"
-  #}
+  backend "azurerm" {
+    resource_group_name  = "sigma"
+    storage_account_name = "sigmadevopstest"
+    container_name       = "tfstate"
+    key                  = "terraform.tfstate"
+  }
 }
 
 locals {
