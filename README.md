@@ -165,6 +165,30 @@ export ARM_SUBSCRIPTION_ID="$(az account list --query "[0].id" -o tsv)"
 cd terraform
 az ad sp create-for-rbac --name "sigma-devops" --role "User Access Administrator" --scopes /subscriptions/$ARM_SUBSCRIPTION_ID > .azure
 ```
+[Configuration](https://github.com/sigma-devops-test/test/blob/main/terraform/modules/azure/aks/main.tf#L57) to access the cluster as Administrator:
+```hcl
+data "azuread_service_principal" "main" {
+  ...
+}
+
+resource "azuread_group" "main" {
+  ...
+}
+
+resource "azuread_group_member" "main" {
+  for_each         = data.azuread_service_principal.main
+  group_object_id  = azuread_group.main.object_id
+  member_object_id = data.azuread_service_principal.main[each.key].object_id
+}
+
+resource "azurerm_kubernetes_cluster" "main" {
+  ...
+  azure_active_directory_role_based_access_control {
+    azure_rbac_enabled     = true
+    admin_group_object_ids = [azuread_group.main.object_id]
+  }
+}
+```
 
 #### 5.2 Architecture: network and related project dependencies
 Learn about Network Architecture and AKS Cluster dependencies (VPC, subnets, security rules, endpoints, etc).
@@ -212,7 +236,7 @@ This is roughly the final architecture based on the node pool 'wordpress'.
         Kubernetes API Server has a public OIDC issuer URL, enabled by [this](https://github.com/sigma-devops-test/test/blob/main/terraform/modules/azure/aks/main.tf#L61) configuration:
         > `oidc_issuer_enabled = true`
     - **Azure AD App Registration**
-    
+
         Links the OIDC identity with Azure. Automatically created when a User-Assigned Managed Identity (UAMI) is created. This app represents the identity in Azure AD that tokens will be validated against.
     - **Federated Identity Credential**  
         Connects:
