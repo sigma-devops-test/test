@@ -11,8 +11,11 @@ Access the [project](https://github.com/orgs/sigma-devops-test/projects/1/views/
 ### 2. Install Docker Desktop
 
 ---
+<details><summary>
 
 ### 3. Configure Environment
+</summary>
+
 3.1 Download and install Base Ubuntu (Windows CMD):
 ```cmd
 set project=sigma
@@ -67,6 +70,7 @@ docker run \
   -v ~/.config:/home/sigma/.config \
   -it --name sigma --rm -w /home/sigma/test sigma
 ```
+</details>
 
 ---
 
