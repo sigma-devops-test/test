@@ -201,7 +201,7 @@ This is roughly the final architecture based on the node pool 'wordpress'.
   - When using **Azure Workload Identity**, service account tokens are OIDC-compliant.
   - Short-lived, signed tokens used for federated login to Azure AD.
 
-**Pod Access to Azure Resources Best Practices**
+#### 6.2. Pod Access to Azure Resources Best Practices
 - **Using Managed Identity + Workload Identity**
   - Secure, passwordless, secretless.
   - Uses federated OIDC tokens + Azure AD.
@@ -209,17 +209,20 @@ This is roughly the final architecture based on the node pool 'wordpress'.
     - **Service Account (SA)**  
       Pod uses this to get a signed token from Kubernetes.
     - **OIDC Issuer**  
-        Kubernetes API Server has a public OIDC issuer URL, enabled by this configuration:
+        Kubernetes API Server has a public OIDC issuer URL, enabled by [this](https://github.com/sigma-devops-test/test/blob/main/terraform/modules/azure/aks/main.tf#L61) configuration:
         > `oidc_issuer_enabled = true`
-    - **Azure AD App Registration**  
-        Links the OIDC identity with Azure.
+    - **Azure AD App Registration**
+    
+        Links the OIDC identity with Azure. Automatically created when a User-Assigned Managed Identity (UAMI) is created. This app represents the identity in Azure AD that tokens will be validated against.
     - **Federated Identity Credential**  
         Connects:
         - OIDC Issuer
         - Kubernetes SA (`system:serviceaccount:<namespace>:<sa-name>`)
         - Azure User-Assigned Managed Identity
+        - Supported by [this](https://github.com/sigma-devops-test/test/blob/main/terraform/modules/azure/aks/main.tf#L62) configuration:
+        > `workload_identity_enabled = true`
 
-#### 6.2. OIDC Federation Flow
+#### 6.3. OIDC Federation Flow
 1. Pod runs with a specific ServiceAccount.
 2. Pod requests a token from the Kubernetes API (`aud: api://AzureADTokenExchange`).
 3. Kubernetes issues a short-lived **OIDC JWT token** signed with its private key.
@@ -231,9 +234,9 @@ This is roughly the final architecture based on the node pool 'wordpress'.
 6. If matched, Azure AD returns an **access token for the Managed Identity**.
 7. Pod uses that token to call Azure services (e.g., **Key Vault**, **Blob Storage**, etc).
 
-#### 6.3. Best Practice Setup for Pods with Azure Access
+#### 6.4. Best Practice Setup for Pods with Azure Access
 1. Create a [**User-Assigned Managed Identity** (UAMI)](https://github.com/sigma-devops-test/test/blob/main/terraform/main.tf#L62-L67) in Azure.
-2. Register an **App in Azure AD** and associate the UAMI with [Role assignment](https://github.com/sigma-devops-test/test/blob/main/terraform/main.tf#L77-L82).
+2. Assign the UAMI with a [Role](https://github.com/sigma-devops-test/test/blob/main/terraform/main.tf#L77-L82).
 3. Add a [**Federated Credential**](https://github.com/sigma-devops-test/test/blob/main/terraform/main.tf#L84-L93):
    - Issuer = AKS OIDC issuer
    - Subject = `system:serviceaccount:<namespace>:<serviceaccount>`
