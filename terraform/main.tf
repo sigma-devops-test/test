@@ -43,10 +43,11 @@ module "test" {
 # terraform import module.aks.azurerm_kubernetes_cluster.main /subscriptions/$ARM_SUBSCRIPTION_ID/resourceGroups/sigma/providers/Microsoft.ContainerService/managedClusters/sigma
 # terraform import module.aks.azurerm_kubernetes_cluster_node_pool.main[\"wordpress\"] /subscriptions/$ARM_SUBSCRIPTION_ID/resourceGroups/sigma/providers/Microsoft.ContainerService/managedClusters/sigma/agentPools/wordpress
 module "aks" {
-  source          = "./modules/azure/aks"
-  tags            = local.default_tags
-  resource_group  = module.test.resource_group.name
-  subnet          = module.test.subnets["BKE-1"].id
+  source         = "./modules/azure/aks"
+  tags           = local.default_tags
+  resource_group = module.test.resource_group.name
+  subnet         = module.test.subnets["BKE-1"].id
+  cluster_admins = ["sigma-devops"]
 
   node_pools = {
     "wordpress" = {

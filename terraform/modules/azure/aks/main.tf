@@ -19,7 +19,7 @@ resource "azurerm_role_assignment" "main" {
 # AKS Cluster Admins #
 ######################
 data "azuread_service_principal" "main" {
-  for_each     = toset(["sigma-devops"])
+  for_each     = toset(var.cluster_admins)
   display_name = each.key
 }
 
@@ -29,7 +29,7 @@ resource "azuread_group" "main" {
   description      = "Admins for AKS cluster: ${var.name}"
 }
 
-resource "azuread_group_member" "sigma_member" {
+resource "azuread_group_member" "main" {
   for_each         = data.azuread_service_principal.main
   group_object_id  = azuread_group.main.object_id
   member_object_id = data.azuread_service_principal.main[each.key].object_id

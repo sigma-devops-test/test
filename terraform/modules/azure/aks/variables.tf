@@ -26,6 +26,12 @@ variable "cluster_version" {
   default     = "1.31.7"
 }
 
+variable "cluster_admins" {
+  description = "Names of principals to be granted Administrator access inside the cluster"
+  type        = list(string)
+  default     = []
+}
+
 variable "identity" {
   description = "Configuration for the AKS cluster identity"
 

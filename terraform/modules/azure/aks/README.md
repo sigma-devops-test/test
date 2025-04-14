@@ -22,7 +22,7 @@ No modules.
 | Name | Type |
 |------|------|
 | [azuread_group.main](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/resources/group) | resource |
-| [azuread_group_member.sigma_member](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/resources/group_member) | resource |
+| [azuread_group_member.main](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/resources/group_member) | resource |
 | [azurerm_kubernetes_cluster.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/kubernetes_cluster) | resource |
 | [azurerm_kubernetes_cluster_node_pool.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/kubernetes_cluster_node_pool) | resource |
 | [azurerm_role_assignment.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
@@ -36,6 +36,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_cluster_admins"></a> [cluster\_admins](#input\_cluster\_admins) | Names of principals to be granted Administrator access inside the cluster | `list(string)` | `[]` | no |
 | <a name="input_cluster_version"></a> [cluster\_version](#input\_cluster\_version) | The Kubernetes version for the AKS cluster | `string` | `"1.31.7"` | no |
 | <a name="input_default_node_pool"></a> [default\_node\_pool](#input\_default\_node\_pool) | Configuration for the AKS default node pool | <pre>object({<br/>    count     = number # Number of nodes<br/>    vm_size   = string # VM size<br/>    disk_size = number # OS disk size in GB<br/>  })</pre> | <pre>{<br/>  "count": 1,<br/>  "disk_size": 30,<br/>  "vm_size": "Standard_D2als_v6"<br/>}</pre> | no |
 | <a name="input_identity"></a> [identity](#input\_identity) | Configuration for the AKS cluster identity | <pre>object({<br/>    type = optional(string, "SystemAssigned")<br/>    role = optional(string, "Contributor")<br/>  })</pre> | <pre>{<br/>  "type": "SystemAssigned"<br/>}</pre> | no |
