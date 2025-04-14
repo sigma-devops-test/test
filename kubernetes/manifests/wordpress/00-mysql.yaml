@@ -1,4 +1,3 @@
-# kubectl create secret generic mysql-pass --from-literal=password=wpsigma
 apiVersion: v1
 kind: Service
 metadata:

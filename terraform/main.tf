@@ -40,8 +40,6 @@ module "test" {
   }
 }
 
-# terraform import module.aks.azurerm_kubernetes_cluster.main /subscriptions/$ARM_SUBSCRIPTION_ID/resourceGroups/sigma/providers/Microsoft.ContainerService/managedClusters/sigma
-# terraform import module.aks.azurerm_kubernetes_cluster_node_pool.main[\"wordpress\"] /subscriptions/$ARM_SUBSCRIPTION_ID/resourceGroups/sigma/providers/Microsoft.ContainerService/managedClusters/sigma/agentPools/wordpress
 module "aks" {
   source         = "./modules/azure/aks"
   tags           = local.default_tags
@@ -60,6 +58,10 @@ module "aks" {
   }
 }
 
+
+####################
+# WordPress Pod ID #
+####################
 # Managed ID (OIDC) to WordPress pods access secrets from Key Vault
 resource "azurerm_user_assigned_identity" "wordpress" {
   name                = "wordpress"
