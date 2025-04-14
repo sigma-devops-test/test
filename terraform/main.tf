@@ -94,3 +94,51 @@ resource "azurerm_federated_identity_credential" "wordpress" {
   parent_id           = azurerm_user_assigned_identity.wordpress.id
   subject             = "system:serviceaccount:default:wordpress"
 }
+
+########
+# RBAC #
+########
+resource "azuread_application" "aks_sigma_readonly_default" {
+  display_name = "aks-namespace-readonly"
+  owners       = [data.azuread_client_config.current.object_id]
+}
+
+resource "azuread_service_principal" "aks_sigma_readonly_default" {
+  client_id = azuread_application.aks_sigma_readonly_default.client_id
+  owners    = [data.azuread_client_config.current.object_id]
+}
+
+resource "azuread_service_principal_password" "aks_sigma_readonly_default" {
+  service_principal_id = azuread_service_principal.aks_sigma_readonly_default.id
+}
+
+resource "azuread_group" "aks_sigma_readonly_default" {
+  display_name     = "aks-sigma-readonly-default"
+  description      = "Read-only access to AKS default namespace"
+  security_enabled = true
+}
+
+resource "azuread_group_member" "aks_sigma_readonly_default" {
+  group_object_id  = azuread_group.aks_sigma_readonly_default.object_id
+  member_object_id = azuread_service_principal.aks_sigma_readonly_default.object_id
+}
+
+resource "azurerm_role_assignment" "aks_sigma_readonly_default" {
+  scope                = "${module.aks.cluster.id}/namespaces/default"
+  role_definition_name = "Azure Kubernetes Service RBAC Reader"
+  principal_id         = azuread_group.aks_sigma_readonly_default.object_id
+}
+
+# eval "$(terraform output -raw aks_sigma_readonly_default)"
+output "aks_sigma_readonly_default" {
+  sensitive = true
+
+  value = <<EOT
+az login --service-principal \
+  -u "${azuread_application.aks_sigma_readonly_default.client_id}" \
+  -p "${azuread_service_principal_password.aks_sigma_readonly_default.value}" \
+  --tenant "${azuread_service_principal.aks_sigma_readonly_default.application_tenant_id}" && \
+  export ARM_TENANT_ID="${azuread_service_principal.aks_sigma_readonly_default.application_tenant_id}"
+EOT
+}
+
