@@ -5,7 +5,7 @@
 Chose to do monorepo for the sake of simplicity.
 
 Access the [project](https://github.com/orgs/sigma-devops-test/projects/1/views/1),
-and the [WordPress site](http://9.169.11.80/).
+and the [WordPress site](http://128.203.116.139).
 
 ---
 
